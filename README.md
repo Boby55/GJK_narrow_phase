@@ -1,7 +1,7 @@
 ﻿# GJK: narrow phase collision detection 
 
 ## Requirements
-**Two 2D convex poly-line objects**
+**Two 2D convex poly-line objects**\n
 -Implement object definition
 -either read line segment positions from text file
 -or implement user interface to create poly-line by clicking on canvas
