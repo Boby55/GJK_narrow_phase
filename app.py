@@ -84,17 +84,36 @@ class MyCanvas(Widget):
             return True
         return super(MyCanvas, self).on_touch_down(touch)
     
-    def save(self, filename="object.txt"):
+    def save(self, filename):
+        if (len(self.polygons)==0):
+            print("Nothing to save")
+            return None
         with open(filename, 'w') as fi:
             for polygon in self.polygons:
                 for point in polygon.points:
-                    print(str(point))
+                    # print(str(point))
                     fi.write(str(point[0]) + ',' + str(point[1]) + '\n')
-                print('#')
+                # print('#')
                 fi.write('#\n')
 
     def load(self, filename):
-        raise NotImplementedError
+        '''Loads new set of polygons from a file and renders them'''
+        points = []
+        try:
+            with open(filename) as fi:
+                while(1):
+                    line = fi.readline()
+                    if len(line) == 0:
+                        self.refresh()
+                        break
+                    elif line[0] == '#':
+                        self.polygons.append(MyPolygon(points))
+                        points = []
+                    else:
+                        points.append(list(map(float,line.strip().split(','))))
+        except FileNotFoundError as e:
+            print("Error opening file {} ".format(filename))
+        
 
 
 class ButtonsContainer(GridLayout):
@@ -105,14 +124,19 @@ class ButtonsContainer(GridLayout):
         self.height = 50
         self.background_color = [0.7,0.7,0.7,1]
         self.btn1 = Button(on_press=self.btn1_save_press, text="Save")
-        self.btn2 = Button(on_press=self.btn2_add_press,text="Add Polygon")
+        self.btn2 = Button(on_press=self.load_pressed, text="Load")
+        self.btn3 = Button(on_press=self.btn2_add_press,text="Add Polygon")
         self.add_widget(self.btn1)
         self.add_widget(self.btn2)
+        self.add_widget(self.btn3)
     
     def btn1_save_press(self, arg):
         print("pressed button 1", arg)
         self.parent.save()
     
+    def load_pressed(self, arg):
+        self.parent.load()
+
     def btn2_add_press(self, arg):
         if not self.parent.mcanvas.adding_poly_mode:
             self.parent.mcanvas.adding_poly_mode = True
@@ -127,10 +151,10 @@ class AppScreen(GridLayout):
         self.add_widget(self.mcanvas)
     
     def save(self):
-        self.mcanvas.save()
+        self.mcanvas.save("object.txt")
 
     def load(self):
-        self.mcanvas.load()
+        self.mcanvas.load("object.txt")
 
 class MyApp(App):
 
