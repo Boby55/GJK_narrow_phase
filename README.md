@@ -15,4 +15,5 @@
 
 ## How to run:
 * You need Kivy library to run this project.
+* Run python3 -m pip install -r requirements.txt in your shell
 * Then just run python3 app.py
