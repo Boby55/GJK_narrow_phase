@@ -6,7 +6,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 # from kivy.uix.textinput import TextInput
 # from kivy.properties import ListProperty
-from kivy.graphics import *
+from kivy.graphics import Line, Mesh, Rectangle
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 
@@ -14,6 +14,7 @@ from math import sqrt
 
 class MyPolygon():
     def __init__(self, points):
+        ''' list of points in format [[x1,y1],[x2,y2],...]'''
         self.points = points[:]
     
     def get_points(self):
@@ -29,6 +30,7 @@ class MyPolygon():
     def draw(self,canvas):
         print(canvas)
         with canvas:
+            # print(self.points)
             Line(points=self.points, width=2)
 
 
@@ -42,10 +44,11 @@ class MyCanvas(Widget):
         # self.bind(size=self.refresh)
         self.adding_poly_mode = False
         self.new_points = []
+        # mesh = Mesh(vertices=[1,1,1,1, 100, 100, 100, 100, 200,200,200,200],indi=[1,2,3])
+        # self.canvas.add(mesh)
+        # self.canvas.add(Line(points=[[10,10], [50,50]]))
 
     def refresh(self, *args):
-        width = self.width
-        height = self.height
         self.canvas.clear()
         for polygon in self.polygons:
             polygon.draw(self.canvas)
@@ -73,12 +76,25 @@ class MyCanvas(Widget):
                     self.adding_poly_mode = False
                     self.polygons.append(MyPolygon(self.new_points))
                     self.new_points = []
+                    self.refresh()
             with self.canvas:
                 Line(points=self.new_points)
                 Rectangle(pos=(touch.x - 5, touch.y - 5), size=(10,10))
             print("touched", touch.pos )
             return True
         return super(MyCanvas, self).on_touch_down(touch)
+    
+    def save(self, filename="object.txt"):
+        with open(filename, 'w') as fi:
+            for polygon in self.polygons:
+                for point in polygon.points:
+                    print(str(point))
+                    fi.write(str(point[0]) + ',' + str(point[1]) + '\n')
+                print('#')
+                fi.write('#\n')
+
+    def load(self, filename):
+        raise NotImplementedError
 
 
 class ButtonsContainer(GridLayout):
@@ -88,17 +104,18 @@ class ButtonsContainer(GridLayout):
         self.size_hint = (1, None)
         self.height = 50
         self.background_color = [0.7,0.7,0.7,1]
-        self.btn1 = Button(on_press=self.btn1_press, text="Save")
+        self.btn1 = Button(on_press=self.btn1_save_press, text="Save")
         self.btn2 = Button(on_press=self.btn2_add_press,text="Add Polygon")
         self.add_widget(self.btn1)
         self.add_widget(self.btn2)
     
-    def btn1_press(self, arg):
+    def btn1_save_press(self, arg):
         print("pressed button 1", arg)
+        self.parent.save()
     
     def btn2_add_press(self, arg):
-        if not self.parent.mc.adding_poly_mode:
-            self.parent.mc.adding_poly_mode = True
+        if not self.parent.mcanvas.adding_poly_mode:
+            self.parent.mcanvas.adding_poly_mode = True
 
 class AppScreen(GridLayout):
     def __init__(self, **kwargs):
@@ -106,9 +123,14 @@ class AppScreen(GridLayout):
         self.rows = 2
         self.buttons = ButtonsContainer()
         self.add_widget(self.buttons)
-        self.mc = MyCanvas()
-        self.add_widget(self.mc)
+        self.mcanvas = MyCanvas()
+        self.add_widget(self.mcanvas)
+    
+    def save(self):
+        self.mcanvas.save()
 
+    def load(self):
+        self.mcanvas.load()
 
 class MyApp(App):
 
