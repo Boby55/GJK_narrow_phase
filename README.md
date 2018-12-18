@@ -1,6 +1,7 @@
 ﻿# GJK: narrow phase collision detection 
 
 ## Requirements
+
 *	**Two 2D convex poly-line objects**
 	*	Implement object definition
 	*	either read line segment positions from text file
@@ -17,5 +18,4 @@
 * You need Kivy library to run this project.
 * Run python3 -m pip install -r requirements.txt in your shell
 * Then just run python3 app.py
-
 ## Demo link : https://youtu.be/QgIEynUqJLI
