@@ -178,7 +178,7 @@ def test_proximity2():
     # B = [[6,1],[6,4],[9,1],[9,4]] # stvorec 2
 
     A = [[1,1],[3,1],[1,3],[3,3]] # stvorec 1
-    B = [[5,1],[6,1],[5,3],[6,3]] # stvorec 2
+    B = [[6,1],[6,3], [2,2]] # stvorec 2
     touch_vect = proximity_GJK(A,B, [])
     print(touch_vect)
     print(Point(touch_vect).magnitude())
