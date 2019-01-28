@@ -12,10 +12,13 @@ from kivy.uix.button import Button
 
 from math import sqrt
 
+from helpers import CH_jarvis, proximity_GJK
+
 class MyPolygon():
     def __init__(self, points):
         ''' list of points in format [[x1,y1],[x2,y2],...]'''
-        self.points = points[:]
+
+        self.points = CH_jarvis(points)
     
     def get_points(self):
         return self.points
@@ -45,8 +48,6 @@ class MyCanvas(Widget):
         self.adding_poly_mode = False
         self.new_points = []
         # mesh = Mesh(vertices=[1,1,1,1, 100, 100, 100, 100, 200,200,200,200],indi=[1,2,3])
-        # self.canvas.add(mesh)
-        # self.canvas.add(Line(points=[[10,10], [50,50]]))
 
     def refresh(self, *args):
         self.canvas.clear()
@@ -99,6 +100,7 @@ class MyCanvas(Widget):
     def load(self, filename):
         '''Loads new set of polygons from a file and renders them'''
         points = []
+        self.polygons = []
         try:
             with open(filename) as fi:
                 while(1):
@@ -115,7 +117,6 @@ class MyCanvas(Widget):
             print("Error opening file {} ".format(filename))
         
 
-
 class ButtonsContainer(GridLayout):
     def __init__(self, **kwargs):
         super(ButtonsContainer, self).__init__(**kwargs)
@@ -126,9 +127,11 @@ class ButtonsContainer(GridLayout):
         self.btn1 = Button(on_press=self.btn1_save_press, text="Save")
         self.btn2 = Button(on_press=self.load_pressed, text="Load")
         self.btn3 = Button(on_press=self.btn2_add_press,text="Add Polygon")
+        self.btn4 = Button(on_press=self.btn_distance,text="Show distance")
         self.add_widget(self.btn1)
         self.add_widget(self.btn2)
         self.add_widget(self.btn3)
+        self.add_widget(self.btn4)
     
     def btn1_save_press(self, arg):
         print("pressed button 1", arg)
@@ -140,6 +143,17 @@ class ButtonsContainer(GridLayout):
     def btn2_add_press(self, arg):
         if not self.parent.mcanvas.adding_poly_mode:
             self.parent.mcanvas.adding_poly_mode = True
+    
+    def btn_distance(self,arg):
+        polyg = self.parent.mcanvas.polygons
+        if len(polyg) != 2:
+            print("Only implemented for exactly 2 polygons!")
+        else:
+            try:
+                v = proximity_GJK(polyg[0].get_points() , polyg[1].get_points(),[])
+                print(v)
+            except:
+                print("Nastala chyba")
 
 class AppScreen(GridLayout):
     def __init__(self, **kwargs):
@@ -155,6 +169,7 @@ class AppScreen(GridLayout):
 
     def load(self):
         self.mcanvas.load("object.txt")
+
 
 class MyApp(App):
 
