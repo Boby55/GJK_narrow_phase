@@ -13,3 +13,9 @@
 *	**Implement user interaction with object**
 	*	User can move object (rotation is optional)
 	*	Show closest points (features) on both geometries
+
+## How to run:
+* You need Kivy library to run this project.
+* Run python3 -m pip install -r requirements.txt in your shell
+* Then just run python3 app.py
+## Demo link : https://youtu.be/QgIEynUqJLI
